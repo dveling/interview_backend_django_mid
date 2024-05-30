@@ -1,10 +1,12 @@
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
-from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
+from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, \
+    InventoryTypeSerializer, InventoryCreatedAfterDateInputSerializer
 
 
 class InventoryListCreateView(APIView):
@@ -33,6 +35,20 @@ class InventoryListCreateView(APIView):
     
     def get_queryset(self):
         return self.queryset.all()
+
+
+class InventoryListAfterDateView(ListAPIView):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+
+    def get_queryset(self):
+        """
+        Filter the inventorys returned to only ones created after a provided date
+        """
+        serializer = InventoryCreatedAfterDateInputSerializer(data=self.request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        return self.queryset.filter(created_at__gt=serializer.validated_data["start_date"])
     
 
 class InventoryRetrieveUpdateDestroyView(APIView):
