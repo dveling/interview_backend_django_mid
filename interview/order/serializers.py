@@ -18,3 +18,8 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'inventory', 'start_date', 'embargo_date', 'tags', 'is_active']
+
+
+class OrderListBetweenStartAndEndDateViewInputSerializer(serializers.Serializer):
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
